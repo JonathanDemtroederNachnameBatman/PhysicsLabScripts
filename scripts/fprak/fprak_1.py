@@ -69,7 +69,7 @@ def plot_fit(ax, x, y, func_type: int, dashed=False):
     style = '--' if dashed else '-'
     ax.plot(X, Y, style, label=f'Fit für {get_eq(func_type)} Peak')
     i_max = np.argmax(Y)
-    half_max = (Y[i_max] + popt[1]) / 2.0 # half of maximum
+    half_max = (Y[i_max]) / 2.0 # half of maximum
     x1 = np.argmin(np.abs(Y[0:i_max] - half_max)) # closest to half max on left
     x2 = np.argmin(np.abs(Y[i_max+1:-1] - half_max)) # closest to half max on right
     return popt, pcov, r, X[x2+i_max+1] - X[x1]
@@ -147,5 +147,5 @@ def doSalz():
 
     maxs = optimize.m
 
-#doPeaks()
-doSalz()
+doPeaks()
+#doSalz()
