@@ -54,6 +54,4 @@ def index(a):
         i[j] = int(round(a[j] / g))
     return i
 
-a = np.array([4.943, 8.087, 9.826])
-g = index(a)
-print(g)
+print(np.geomspace(1, 1000))
