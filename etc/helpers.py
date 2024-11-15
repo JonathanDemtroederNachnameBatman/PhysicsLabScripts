@@ -106,8 +106,12 @@ def calc_r(func, xdata, ydata, popt):
 def si(val, err, prec, units):
     return '\\SI{' + str(round(val, prec)) + '(' + str(round(err, prec)) + ')}{\\' + '\\'.join(units) + '}'
 
+def plot_max(self, x, y, label):
+    self.plot([x, x], [0, y], '--', label=label, linewidth=1)
+
 Axes.config = config_axis
 Axes.configx = config_xaxis
 Axes.configy = config_yaxis
 Axes.text_box = make_text_box
+Axes.plot_max = plot_max
 xw.Sheet.array = col

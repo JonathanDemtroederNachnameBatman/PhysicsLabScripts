@@ -74,7 +74,7 @@ def col(self, range: str):
     return np.array(self.range(range).value)
 
 def single_param_text(name, value, error, precision):
-    return f'${name}={round(value, precision)}\pm{round(error, precision)}$'
+    return f'${name}={round(value, precision)}\\pm{round(error, precision)}$'
 
 def param_text(param_tuples):
     # param tuple: (name, value, error, precision)

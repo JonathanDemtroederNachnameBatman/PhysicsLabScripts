@@ -1,4 +1,4 @@
-Position [V]	Intensit‰t [Skt]
+Position [V]	Intensit√§t [Skt]
 0,00000	3,70283
 0,00880000	3,31203
 0,0176000	3,07755
@@ -58,7 +58,7 @@ Position [V]	Intensit‰t [Skt]
 0,492800	3,29249
 0,501600	3,28272
 0,510400	3,26318
-Position [V]	Intensit‰t [Skt]
+Position [V]	Intensit√§t [Skt]
 0,00000	3,17525
 0,00880000	3,17525
 0,0176000	3,17525
