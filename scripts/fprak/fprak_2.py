@@ -1,4 +1,3 @@
-from cProfile import label
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -109,7 +108,7 @@ def do_halogen():
     ax.config(hp.AxisConfig(label='$\\lambda$ in nm'), hp.AxisConfig(label='Intensität', ticks=False))
     l = voltfreq_to_lamda(freq)
 
-    ax.plot(l, y, '.--', label='Halogen', linewidth=1)
+    ax.plot(l, y, '.--', label='Halogen - Si', linewidth=1)
     i = np.argmax(y)
     #ax.plot_max(l[i], y[i], f'Halogen Max: {int(l[i])}nm')
     D = read('Halogen_PbS')
@@ -147,4 +146,4 @@ def do_halogen():
 
 #do_piezo()
 #do_laser()
-do_halogen()
+#do_halogen()

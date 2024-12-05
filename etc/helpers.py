@@ -73,8 +73,10 @@ def excel(path: str):
 def col(self, range: str):
     return np.array(self.range(range).value)
 
-def single_param_text(name, value, error, precision):
-    return f'${name}={round(value, precision)}\\pm{round(error, precision)}$'
+def single_param_text(name, value, error=None, precision=3):
+    if error is None:
+        return f'${name}={value:.{precision}f}$'
+    return f'${name}={value:.{precision}f}\\pm{error:.{precision}f}$'
 
 def param_text(param_tuples):
     # param tuple: (name, value, error, precision)
@@ -83,13 +85,16 @@ def param_text(param_tuples):
         text += single_param_text(param[0], param[1], param[2], param[3]) + '\n'
     return text
 
-def param_text_fit(names, popt, pcov, precision):
+def param_text_fit(names, popt, precision=3, epopt=None, pcov=None):
     precision = np.full(len(names), precision) if isinstance(precision, numbers.Number) else precision
-    perr = np.sqrt(np.diag(pcov))
-    l = min(len(names), len(popt), len(perr))
+    if epopt is None and pcov is not None:
+        epopt = np.sqrt(np.diag(pcov))
+    l1 = len(epopt) if epopt is not None else len(popt)
+    l = min(len(names), len(popt), l1)
     text = ''
     for i in range(l):
-        text += single_param_text(names[i], popt[i], perr[i], precision[i]) + '\n'
+        e = epopt[i] if epopt is not None else None
+        text += single_param_text(names[i], popt[i], e, precision[i]) + '\n'
     return text[0:-1]
 
 def curve_fit(func, xdata, ydata, *args, **kwargs):
@@ -108,6 +113,33 @@ def si(val, err, prec, units):
 
 def plot_max(self, x, y, label):
     self.plot([x, x], [0, y], '--', label=label, linewidth=1)
+
+def to_latex_table(a, ea=None, precision=3, col0=None):
+    text = '\t\t\\hline\n\t\t'
+    a = np.asanyarray(a)
+    if ea is not None:
+        ea = np.abs(np.asanyarray(ea))
+    if a.ndim == 2:
+        for i in range(a.shape[0]):
+            if col0 is not None:
+                text += f'{col0[i]} & '
+            for j in range(a.shape[1]):
+                if ea is None:
+                    text += f'${a[i][j]:.{precision}f}$ & '
+                else:
+                    text += f'${a[i][j]:.{precision}f} \\pm {ea[i][j]:.{precision}f}$ & '
+            text = text[:-2] + '\\\\ \\hline\n\t\t'
+    elif a.ndim == 1:
+        for j in range(a.shape[0]):
+            if col0 is not None:
+                text += f'{col0[j]} & '
+            if ea is None:
+                text += f'${a[j]:.{precision}f}$ \\\\ \\hline\n\t\t'
+            else:
+                text += f'${a[j]:.{precision}f} \\pm {ea[j]:.{precision}f}$ \\\\ \\hline\n\t\t'
+    else: raise Exception('Wrong number of dimensions')
+    return text[:-3]
+
 
 Axes.config = config_axis
 Axes.configx = config_xaxis
