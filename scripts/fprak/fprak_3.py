@@ -6,10 +6,8 @@ import scipy.signal
 from scipy import optimize
 from scipy import signal
 from scipy import stats
-from scipy.constants import precision
 
 from etc import helpers as hp
-from lmfit.models import ConstantModel, LorentzianModel
 
 def read(file):
     return pd.read_csv(f'../../data/fprak_3/{file}.txt', decimal=',', header=None, dtype=np.float64, skiprows=6, sep=r'\s+').to_numpy().T
@@ -212,7 +210,9 @@ def eisenfolie():
     save('eisenfolie')
     plt.show()
 
-    dvr = popt[3:][3:] - np.flip(popt[3:][:3])
+    upper_pos = popt[3:][3:]
+    lower_pos = np.flip(popt[3:][:3])
+    dvr = upper_pos - lower_pos
     dv = [1.677, 6.167, 10.6570]
     l = stats.linregress(dvr, dv)
     print(l.slope, l.stderr, l.rvalue)
@@ -223,10 +223,11 @@ def eisenfolie():
     ax.plot(X, X*l.slope + l.intercept, '--')
     plt.show()
 
-    print(popt[3:][:3], dvr)
-    cs = (np.flip(popt[3:][:3]) + dvr / 2)
-    print(cs)
-    cs *= 14.72
+    c = 14.819
+    lower_pos *= c
+    upper_pos *= c
+    print(lower_pos, upper_pos, dvr)
+    cs = (lower_pos + upper_pos) / 2
     print(cs)
     print(np.average(cs), np.std(cs))
 
@@ -262,6 +263,6 @@ def calc_effects_all():
 #rotes_bls()
 #gelbes_bls()
 #stahl()
-#eisenfolie()
+eisenfolie()
 
-calc_effects_all()
+#calc_effects_all()

@@ -21,7 +21,7 @@ ax.text_box('Text', 0.025, 0.8)  # Fügt eine textbox mit relativer positionieru
 # helper class to easily decorate multiple plots with similar data
 class AxisConfig:
 
-    def __init__(self, min=None, max=None, minors=None, majors=None, label=None, ticks=True, labelsize=10):
+    def __init__(self, min=None, max=None, minors=None, majors=None, label=None, ticks=None, labelsize=10):
         self.min = min
         self.max = max
         self.minors = minors
@@ -46,7 +46,7 @@ class AxisConfig:
             else: 
                 raise Exception('Wrong minors type')
         if self.label: set_label(self.label, fontsize=self.labelsize, fontweight='medium')
-        if not self.ticks: axis.set_ticklabels([])
+        if self.ticks: axis.set_ticklabels(self.ticks)
         if self.min or self.max: set_lim(self.min, self.max)
 
 # helper method to easily decorate a plot
