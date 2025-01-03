@@ -140,6 +140,14 @@ def to_latex_table(a, ea=None, precision=3, col0=None):
     else: raise Exception('Wrong number of dimensions')
     return text[:-3]
 
+def latex_num(a, power=0, err=None, precision=3):
+    b = a / (10 ** power)
+    s = ('{:.' + str(precision) + 'f}').format(b)
+    if err is not None:
+        e = err / (10 ** power)
+        s += ('({:.' + str(precision) + 'f})').format(e)
+    if power == 0: return f'\\num{{{s}}}'
+    return f'\\num{{{s}e{power}}}'
 
 Axes.config = config_axis
 Axes.configx = config_xaxis
