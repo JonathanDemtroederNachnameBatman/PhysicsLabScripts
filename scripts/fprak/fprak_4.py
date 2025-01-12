@@ -7,7 +7,6 @@ from matplotlib.ticker import LogLocator, FixedLocator, MultipleLocator, ScalarF
 from scipy import optimize
 from scipy import signal
 from scipy import stats
-from si_prefix import si_format
 
 from etc import helpers as hp
 
@@ -36,24 +35,42 @@ def druck():
     plt.show()
 
 def langmuir(name):
+    w = '6.7 W' if name.startswith('7W') else '3.0 W'
+    if '2raus' in name:
+        v = 'Mittig'
+    elif '4raus' in name:
+        v = 'Tief'
+    else:
+        v = 'Hoch'
+    if 'rechts' in name:
+        h = 'rechter Rand'
+    elif 'links' in name:
+        h = 'linker Rand'
+    else:
+        # if 'mitte' in name or 'mittig' in name:
+        h = 'Mittig'
+
     D = read(name)
     p = np.average(D[1])
     U = D[0]
     I = D[2]
-    fig, ax = plt.subplots(figsize=(16/2.54, 9/2.54))
+    width = 10
+    height = 10
+    fig, ax = plt.subplots(figsize=(width/2.54, height/2.54))
     ax.config(hp.AxisConfig(label='Sondenspannung $U_B$ in $V$'), hp.AxisConfig(label='Strom $I$ in $mA$'))
     ax.plot(U, I, '.k', label=name, markersize=1)
-    #ax.text_box(f'$p={round(p, 4)} mb$', 0.025, 0.85)
-    ax.legend()
-    save(name, svg=False)
-    plt.show()
-    fig, ax = plt.subplots(figsize=(16/2.54, 9/2.54))
-    ax.config(hp.AxisConfig(label='Sondenspannung $U_B$ in $V$'), hp.AxisConfig(label='Strom $I$ in $mA$'))
+    ax.text_box(f'P={w}\np={round(p, 2)} mb\nVertikal: {v}\nHorizontal: {h}', 0.035, 0.965)
+    #ax.legend()
+    save(name, svg=True)
+    plt.show(bbox_inches='tight')
+    fig, ax = plt.subplots(figsize=(width/2.54, height/2.54))
+    ax.config(hp.AxisConfig(label='Sondenspannung $U_B$ in $V$'), hp.AxisConfig(label='Strom $ln(I)$ in $ln(mA)$'))
     ax.plot(U, I, '.k', label=f'{name} - ln', markersize=1)
-    ax.text_box(f'$p={round(p, 4)} mb$', 0.025, 0.85)
+
+    ax.text_box(f'P={w}\np={round(p, 2)} mb\nVertikal: {v}\nHorizontal: {h}\nhalb logarithmisch', 0.035, 0.965)
     ax.set_yscale('log')
-    ax.legend()
-    save(f'{name}_ln', svg=False)
+    #ax.legend()
+    save(f'{name}_ln', svg=True)
 
 def plot_linregress(ax, x, y, l, fmt='--', linewidth=2.0, name=None):
     x1 = min(max((np.min(y)-l.intercept)/l.slope, np.min(x)), np.max(x))
@@ -193,6 +210,6 @@ def langmuir_all():
 
 #druck()
 #langmuir_all()
-#langmuir('7W2rausmitte_wenig_druck')
-analyze_langmuir('7W4rausmitte_wenig_druck', 70, 70, 160, -80, -1)
+langmuir('7W2rausmitte_wenig_druck')
+#analyze_langmuir('7W4rausmitte_wenig_druck', 70, 70, 160, -80, -1)
 #analyze_langmuir('7W2rausmitte_wenig_druck', 70, 70, 150, -70, -1)
