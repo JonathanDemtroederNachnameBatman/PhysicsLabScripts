@@ -29,19 +29,27 @@ def widerstand_c(T, R2):
 
     popt, pcov = optimize.curve_fit(inv_temp_c, Ra, 1 / Ta)
     print(popt)
+    epopt = np.sqrt(np.diag(pcov))
     x = np.linspace(Ra[0], Ra[-1], 100)
     y = inv_temp_c(x, *popt)
-    ax.plot(x, y, '--', label='Fit $A\\cdot ln(R) + B + C/ln(R)$')
+    ax.plot(x, y, '--', label='Fit $1/T=A\\cdot ln(R) + B + C/ln(R)$')
     ax.grid(True)
+    ax.text_box(f'$A={popt[0]:.4f}\\pm{epopt[0]:.4f}$\n$B={popt[1]:.4f}\\pm{epopt[1]:.4f}$\n$C={popt[2]:.4f}\\pm{epopt[2]:.4f}$', 0.975, 0.035, horizontal='right', vertical='bottom')
     plt.legend()
     save('kohlenstoff')
     plt.show()
 
 def widerstand_supra(T, R):
     fig, ax = plt.subplots(figsize=(16/2.54, 9.5/2.54))
-    ax.config(hp.AxisConfig(label='T'), hp.AxisConfig(label='R'))
-    ax.plot(T, R, '.')
+    ax.config(hp.AxisConfig(label='$R_{YBCO}$ in $\\Omega$'), hp.AxisConfig(label='T in K'))
+    ax.plot(R, T, '.')
+    plt.show()
 
+    fig, ax = plt.subplots(figsize=(16 / 2.54, 9.5 / 2.54))
+    ax.config(hp.AxisConfig(label='$R_{YBCO}$ in $\\Omega$'), hp.AxisConfig(label='T in K'))
+    ax.plot(R, T, '.')
+    ax.set_xlim(0.7, 2)
+    ax.set_ylim(20, 100)
     plt.show()
     pass
 
@@ -64,8 +72,8 @@ def widerstand():
     m = (TN - T0) / (R1[-1] - R1[0])
     b = T0 - m * R1[0]
     T = R1 * m + b
-    print(m)
-    print(b)
+    #print(m)
+    #print(b)
     #print(T)
 
     #fig, ax = plt.subplots()
