@@ -190,7 +190,6 @@ def analyze_langmuir(name, k, i1, i2, j1, j2, val_only=False):
     print(m)
 
 
-
 def langmuir_all():
     langmuir('1')
     langmuir('mittig')

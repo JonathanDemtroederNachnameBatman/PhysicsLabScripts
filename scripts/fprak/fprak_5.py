@@ -43,13 +43,24 @@ def widerstand_supra(T, R):
     fig, ax = plt.subplots(figsize=(16/2.54, 9.5/2.54))
     ax.config(hp.AxisConfig(label='$R_{YBCO}$ in $\\Omega$'), hp.AxisConfig(label='T in K'))
     ax.plot(R, T, '.')
+    save('htsl')
     plt.show()
 
-    fig, ax = plt.subplots(figsize=(16 / 2.54, 9.5 / 2.54))
-    ax.config(hp.AxisConfig(label='$R_{YBCO}$ in $\\Omega$'), hp.AxisConfig(label='T in K'))
+    fig, ax = plt.subplots(figsize=(12 / 2.54, 9 / 2.54))
+    ax.config(hp.AxisConfig(label='$R_{YBCO}$ in $\\Omega$', majors=0.04, minors=4), hp.AxisConfig(label='T in K', minors=2))
     ax.plot(R, T, '.')
-    ax.set_xlim(0.7, 2)
-    ax.set_ylim(20, 100)
+    ax.set_xlim(1.4, 1.56)
+    ax.set_ylim(75, 90)
+    T1 = T[-2]
+    T2 = T[-4]
+    R1 = R[-2]
+    R2 = R[-4]
+    print(T1, T2, R1, R2)
+    print(R[-5], R[-6])
+    print(np.std([T1, T2]))
+    ax.plot([R1, R[-3], R2], [T1, T[-3], T2], 'r.', label=f'Sprung, Mittelwert: ${round((T2+T1)/2, 3)}$ K')
+    plt.legend()
+    save('sprungtemperatur')
     plt.show()
     pass
 
@@ -85,5 +96,59 @@ def widerstand():
     #widerstand_c(T, R2)
     widerstand_supra(T, R3)
 
+def verdampfungsentalpie():
+    sheet = hp.excel('../../data/fprak_5/Miristkalt.xlsx')
+    D1 = sheet.array('A88:B97').T
+    D2 = sheet.array('D88:E98').T
+    D3 = sheet.array('G88:H98').T
+    P0 = 0
+    U1 = 35.0
+    U2 = 49.1
+    eU = 0.1
+    I1 = 0.746
+    I2 = 1.043
+    eI = 0.001
+    P1 = U1 * I1
+    P2 = U2 * I2
+    eP1 = np.sqrt((I1*eU)**2 + (U1*eI)**2)
+    eP2 = np.sqrt((I2*eU)**2 + (U2*eI)**2)
+    print(eP1, eP2)
+
+    fig, ax = plt.subplots(figsize=(16/2.54, 9.5/2.54))
+    ax.config(hp.AxisConfig(label='t in s', majors=300, minors=5), hp.AxisConfig(label='V in $m^3$', min=0.4, max=1.9, minors=2))
+    l0 = stats.linregress(D1[0]*60, D1[1])
+    l1 = stats.linregress(D2[0]*60, D2[1])
+    l2 = stats.linregress(D3[0]*60, D3[1])
+    print('r: ', l0.rvalue, l1.rvalue, l2.rvalue)
+    dVdt1 = (l1.slope - l0.slope)
+    dVdt2 = (l2.slope - l0.slope)
+    edVdt1 = np.sqrt(l1.stderr**2 + l0.stderr**2)
+    edVdt2 = np.sqrt(l2.stderr**2 + l0.stderr**2)
+    print(dVdt1*1e5, edVdt1*1e5, dVdt2*1e5, edVdt2*1e5)
+    x = np.array([0, D1[0][-1]]) * 60
+    ax.plot(x, x * l0.slope + l0.intercept, '--', color='tab:blue')
+    ax.plot(x, x * l1.slope + l1.intercept, '--', color='tab:orange')
+    ax.plot(x, x * l2.slope + l2.intercept, '--', color='tab:green')
+    ax.plot(D1[0]*60, D1[1], 'o', label=f'$P_0=0W$, Slope = {round(l0.slope, 6):.2e}', color='tab:blue')
+    ax.plot(D2[0]*60, D2[1], 'o', label=f'$P_1={P1:.3f}W$, Slope = {round(l1.slope, 6):.2e}', color='tab:orange')
+    ax.plot(D3[0]*60, D3[1], 'o', label=f'$P_2={P2:.3f}W$, Slope = {round(l2.slope, 6):.2e}', color='tab:green')
+
+    #Vm = 15.121e-3
+    Vm = 22.413e-3
+    eVm = 8.770e-3
+    dH1 = P1 / dVdt1
+    dH2 = P2 / dVdt2
+    edH1 = np.sqrt((eP1 / dVdt1)**2 + (P1 * edVdt1 / dVdt1)**2)
+    edH2 = np.sqrt((eP2 / dVdt2)**2 + (P2 * edVdt2 / dVdt2)**2)
+    dH = (dH1 + dH2) / 2
+    edH = np.sqrt((edH1/2)**2 + (edH2/2)**2)
+    print(dH1, edH1, dH2, edH2)
+    print(dH, edH)
+    #print(dH * Vm *1e-3, np.sqrt((edH*Vm)**2 + (dH*eVm)**2)*1e-3)
+    print(dH * Vm *1e-3, edH * Vm *1e-3)
+    plt.legend()
+    save('verdampfen')
+    plt.show()
 
 widerstand()
+#verdampfungsentalpie()
